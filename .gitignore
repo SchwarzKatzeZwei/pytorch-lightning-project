@@ -131,3 +131,5 @@ dmypy.json
 # PyTorch Lightning
 dataset
 lightning_logs
+tmp
+temp

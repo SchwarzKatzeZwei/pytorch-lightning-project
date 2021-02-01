@@ -1,15 +1,15 @@
+import re
+
 import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from torch.utils.data.dataset import Subset
-from torchvision.datasets import MNIST
 
+from dataset_loader import DatasetLoader
 from models.cnnnet import CNNNet
 from transforms import Transforms
 
 
-class CNNModel(pl.LightningModule):
+class PLModule(pl.LightningModule):
 
     def __init__(self):
         super().__init__()
@@ -30,16 +30,21 @@ class CNNModel(pl.LightningModule):
 
 def main():
     transform = Transforms.compose()
-    train_set = MNIST(root='dataset', train=True, download=True, transform=transform)
-    train_set = Subset(train_set, list(range(0, 1000)))
-    train_loader = DataLoader(train_set, batch_size=100, shuffle=False, num_workers=4, pin_memory=True)
+    train_dataset = DatasetLoader.mnist(transform=transform, indices=list(range(0, 1000)))
+    train_loader = DatasetLoader.make_loader(train_dataset, batch_size=100, num_workers=4)
 
     # init model
-    model = CNNModel()
+    model = PLModule()
 
-    # most basic trainer, uses good defaults (auto-tensorboard, checkpoints, logs, and more)
-    # trainer = pl.Trainer(gpus=8) (if you have GPUs)
-    trainer = pl.Trainer(max_epochs=5)
+    # make pytorch lightning trainer
+    trainer_args = {
+        "max_epochs": 5
+    }
+    if torch.cuda.is_available():
+        trainer_args["gpus"] = -1
+    trainer = pl.Trainer(**trainer_args)
+
+    # train
     trainer.fit(model, train_loader)
 
 
