@@ -133,3 +133,6 @@ dataset
 lightning_logs
 tmp
 temp
+
+# Mac
+.DS_Store
