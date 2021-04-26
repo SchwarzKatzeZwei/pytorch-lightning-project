@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
-from cnn_finetune import make_model
+# from cnn_finetune import make_model
 
 from dataset_loader import DatasetLoader
 from models.cnnnet import CNNNet
@@ -12,8 +12,8 @@ class PLModule(pl.LightningModule):
 
     def __init__(self):
         super().__init__()
-        # self.net = CNNNet()
-        self.net = make_model('resnet18', num_classes=2, pretrained=True)
+        self.net = CNNNet()
+        # self.net = make_model('resnet18', num_classes=2, pretrained=True)
         self.accuracy = pl.metrics.Accuracy()
 
     def forward(self, x):
@@ -26,7 +26,7 @@ class PLModule(pl.LightningModule):
         loss = F.cross_entropy(y_hat, y)
         self.log('train_loss', loss)
         # log step metric
-        self.log('train_acc_step', self.accuracy(y_hat, y))
+        # self.log('train_acc_step', self.accuracy(y_hat, y))
         return loss
 
     def configure_optimizers(self):
@@ -40,16 +40,18 @@ class PLModule(pl.LightningModule):
 
 def main():
     transform = Transforms.compose()
-    # train_dataset = DatasetLoader.mnist(transform=transform)
-    train_dataset = DatasetLoader.image_folder("tmp/train", transform=transform)
-    train_loader = DatasetLoader.make_loader(train_dataset, batch_size=10, num_workers=4)
+    train_dataset = DatasetLoader.mnist(transform=transform, indices=range(0, 10000))
+    # train_dataset = DatasetLoader.image_folder("tmp/train", transform=transform)
+    train_loader = DatasetLoader.make_loader(train_dataset, batch_size=10, num_workers=8)
 
     # init model
+    # model = CNNNet()
     model = PLModule()
 
     # make pytorch lightning trainer
     trainer_args = {
-        "max_epochs": 5
+        "max_epochs": 3,
+        "precision": 16,
     }
     if torch.cuda.is_available():
         trainer_args["gpus"] = -1

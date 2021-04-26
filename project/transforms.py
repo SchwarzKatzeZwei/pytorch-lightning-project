@@ -14,10 +14,10 @@ class Transforms():
         """
         x: list = []
         x_appned = x.append
-        x_appned(tf.Resize((224, 224)))
+        # x_appned(tf.Resize((224, 224)))
         x_appned(tf.ToTensor())
-        # x_appned(tf.Normalize((0.5, ), (0.5, )))
-        x_appned(tf.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
+        x_appned(tf.Normalize((0.5, ), (0.5, )))
+        # x_appned(tf.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
         # x_appned(tf.CenterCrop(size))
         # x_appned(tf.ColorJitter(sbrightness=0, contrast=0, saturation=0, hue=0ize))
         # x_appned(tf.FiveCrop(size))
